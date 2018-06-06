@@ -18,11 +18,34 @@ const list = [{
   points: 5,
   objectID: 1,  
 }];
-class App extends Component {
-  render() {
-    return (      
-      <div className = "App">
-        {list.map(item =>
+
+
+const isSearched = searchText => item => item.title.toLowerCase().includes(searchText.toLowerCase());
+class FormP extends Component{
+  constructor(props){
+    super(props);
+    this.state = {list,searchText:''};
+    this.onSearchChange = this.onSearchChange.bind(this);
+    this.onDismiss = this.onDismiss.bind(this);
+  }
+  onSearchChange(e){
+    this.setState({searchText:e.target.value});
+  }
+  onDismiss(id){
+    console.log(this);
+    const updateList = this.state.list.filter(item =>
+      item.objectID !== id
+    );
+    this.setState({list:updateList});
+  }
+  render(){
+    return(
+      <div className = "FormP">
+        <form>
+          <input type="text" onChange = {this.onSearchChange}/>
+        </form>
+        {this.state.list.filter(isSearched(this.state.searchText)).map(
+          item =>
           <div key = {item.objectID}>
           <span>
             <a href= {item.url}>{item.title}</a>
@@ -30,12 +53,53 @@ class App extends Component {
           <span>{item.author}</span>
           <span>{item.num_comments}</span>
           <span>{item.points}</span>
-        </div>         
-        )}      
+          <span>
+            <button onClick = {()=>this.onDismiss(item.objectID)}>Dismiss</button>
+          </span>
+        </div>  
+        )}
       </div>
-    );
+    )
   }
 }
 
-export default App;
+// class App extends Component {
+
+//   constructor(props){
+//     super(props);
+//     this.state = {
+//       list
+//     }
+//     this.onDismiss = this.onDismiss.bind(this);
+//   }
+//   onDismiss(id){
+//     console.log(this);
+//     const updateList = this.state.list.filter(item =>
+//       item.objectID !== id
+//     );
+//     this.setState({list:updateList});
+//   }
+
+//   render() {
+//     return (      
+//       <div className = "App">
+//         {this.state.list.map(item =>
+//           <div key = {item.objectID}>
+//           <span>
+//             <a href= {item.url}>{item.title}</a>
+//           </span>
+//           <span>{item.author}</span>
+//           <span>{item.num_comments}</span>
+//           <span>{item.points}</span>
+//           <span>
+//             <button onClick = {()=>this.onDismiss(item.objectID)}>Dismiss</button>
+//           </span>
+//         </div>         
+//         )}      
+//       </div>
+//     );
+//   }
+// }
+
+export default FormP;
 
