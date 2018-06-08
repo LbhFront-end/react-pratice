@@ -59,7 +59,8 @@ class FormP extends Component {
     this.fetchSearchTopStories(searchText);
   }
   onDismiss(id) {
-    console.log(this);
+    // console.log(this);
+    // console.log(this.state.result);
     const updateList = this.state.result.hits.filter(item =>
       item.objectID !== id
     );
@@ -70,7 +71,6 @@ class FormP extends Component {
   }
 
   render() {
-    console.log(this.state);
     const { searchText, result } = this.state;
     if(!result){
       return null;
@@ -81,10 +81,13 @@ class FormP extends Component {
           <Search
             value={searchText}
             onChange={this.onSearchChange} />
-          <Table
-            list={result.hits}
-            pattern={searchText}
-            onDismiss={this.onDismiss} />
+            {
+              result?          
+              <Table
+              list={result.hits}
+              pattern={searchText}
+              onDismiss={this.onDismiss}/>:null
+            }
         </div>
       </div>
     )
