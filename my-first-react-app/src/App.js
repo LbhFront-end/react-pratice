@@ -8,7 +8,7 @@ const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
 const PARAM_SEARCH = 'query=';
 
-const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}`;
+// const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchText}`;
 
 // const list = [{
 //   title: 'React',
@@ -37,25 +37,35 @@ class FormP extends Component {
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
     this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.onSearchSubmit = this.onSearchSubmit.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
   }
 
   onSearchChange(e) {
+    // console.log( e.target.value);
     this.setState({ searchText: e.target.value });
   }
 
-  setSearchTopStories(result){
-    this.setState({result});
+  onSearchSubmit(e) {
+    const { searchText } = this.state;
+    // console.log( searchText);
+    this.fetchSearchTopStories(searchText);
+    e.preventDefault();
   }
 
-  fetchSearchTopStories(searchText){
-    fetch(url)
+  setSearchTopStories(result) {
+    this.setState({ result });
+  }
+
+  fetchSearchTopStories(searchText) {
+    // console.log(url);
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchText}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
       .catch(e => e);
   }
-  componentDidMount(){
-    const {searchText} = this.state;
+  componentDidMount() {
+    const { searchText } = this.state;
     this.fetchSearchTopStories(searchText);
   }
   onDismiss(id) {
@@ -66,35 +76,38 @@ class FormP extends Component {
     );
     // this.setState({ result: Object.assign({},this.state.result,{hits:updateList}) });
     this.setState({
-      result:{...this.state.result, hits: updateList}
+      result: { ...this.state.result, hits: updateList }
     });
   }
 
   render() {
     const { searchText, result } = this.state;
-    if(!result){
+    if (!result) {
       return null;
     }
     return (
       <div className="page">
-        <div className = "interactions">
+        <div className="interactions">
           <Search
             value={searchText}
-            onChange={this.onSearchChange} />
-            {
-              result?          
+            onChange={this.onSearchChange}
+            onSubmit={this.onSearchSubmit}>
+            Search
+          </Search>
+          {
+            result ?
               <Table
-              list={result.hits}
-              pattern={searchText}
-              onDismiss={this.onDismiss}/>:null
-            }
+                list={result.hits}
+                // pattern={searchText}
+                onDismiss={this.onDismiss} /> : null
+          }
         </div>
       </div>
     )
   }
 }
 
-const Button  = ({ onClick, className, children }) =>
+const Button = ({ onClick, className, children }) =>
   <button
     onClick={onClick}
     className={className}
@@ -102,21 +115,24 @@ const Button  = ({ onClick, className, children }) =>
     {children}
   </button>
 
-const isSearched = searchText => item => item.title.toLowerCase().includes(searchText.toLowerCase());
+// const isSearched = searchText => item => item.title.toLowerCase().includes(searchText.toLowerCase());
 
-const Search = ({ value, onChange, children }) =>
-  <form>
-    {children}
+const Search = ({ value, onChange, onSubmit, children }) =>
+  <form onSubmit={onSubmit} >
     <input
       type="text"
       value={value}
-      onChange={onChange} />
+      onChange={onChange}
+    />
+    <button type="submit">
+      {children}
+    </button>
   </form>
 
-const Table = ({ list, pattern, onDismiss }) =>
-<div className = "main">
-  <div className="table">
-      {list.filter(isSearched(pattern)).map(item =>
+const Table = ({ list, onDismiss }) =>
+  <div className="main">
+    <div className="table">
+      {list.map(item =>
         <div key={item.objectID} className="table-row">
           <span style={{ width: '40%' }}>
             <a href={item.url}>{item.title}</a>
@@ -134,8 +150,8 @@ const Table = ({ list, pattern, onDismiss }) =>
       )}
     </div>
     <div>
-      <Shining/>
+      <Shining />
     </div>
-</div>
+  </div>
 export default FormP;
 
