@@ -60,7 +60,6 @@ class FormP extends Component {
     const oldHits = page !== 0 ? this.state.result.hit : [];
     const updateHits = [...oldHits, ...hits];
     this.setState({ hits: updateHits, page });
-    console.log(result);
   }
 
   fetchSearchTopStories(searchText, page = 0) {
