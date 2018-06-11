@@ -7,7 +7,9 @@ const DEFAULT_QUERY = 'redux';
 const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
 const PARAM_SEARCH = 'query=';
-
+const PARAM_PAGE = 'page=';
+const DEFAULT_HPP = '100';
+const PARAM_HPP = 'hitsPerPage=';
 // const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchText}`;
 
 // const list = [{
@@ -54,12 +56,16 @@ class FormP extends Component {
   }
 
   setSearchTopStories(result) {
-    this.setState({ result });
+    const { hits, page } = result;
+    const oldHits = page !== 0 ? this.state.result.hit : [];
+    const updateHits = [...oldHits, ...hits];
+    this.setState({ hits: updateHits, page });
+    console.log(result);
   }
 
-  fetchSearchTopStories(searchText) {
+  fetchSearchTopStories(searchText, page = 0) {
     // console.log(url);
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchText}`)
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchText}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
       .catch(e => e);
@@ -82,6 +88,7 @@ class FormP extends Component {
 
   render() {
     const { searchText, result } = this.state;
+    const page = (result && result.page) || 0;
     if (!result) {
       return null;
     }
@@ -101,6 +108,9 @@ class FormP extends Component {
                 // pattern={searchText}
                 onDismiss={this.onDismiss} /> : null
           }
+          <div className="interactions">
+            <Button onClick={() => this.fetchSearchTopStories(searchText, page + 1)}>More</Button>
+          </div>
         </div>
       </div>
     )
